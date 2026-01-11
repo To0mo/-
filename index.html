@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Color Transparency Tool</title>
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: sans-serif;
+    }
+    #controls {
+        padding: 10px;
+        background: #111;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+    }
+    canvas {
+        display: block;
+        margin: 100px auto 0;
+        cursor: crosshair;
+    }
+</style>
+</head>
+<body>
+
+<div id="controls">
+    <input type="file" id="fileInput" accept="image/*">
+    距離:
+    <input type="range" id="threshold" min="0" max="500" value="30">
+    <span id="thValue">30</span>
+    <button id="resetBtn">元に戻す</button>
+    <button id="saveBtn">保存</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const fileInput = document.getElementById("fileInput");
+const thresholdSlider = document.getElementById("threshold");
+const thValue = document.getElementById("thValue");
+const resetBtn = document.getElementById("resetBtn");
+const saveBtn = document.getElementById("saveBtn");
+
+let originalImageData = null;
+let targetColor = null;
+
+// --- 市松模様パターン作成 ---
+function createCheckerPattern(size = 16) {
+    const p = document.createElement("canvas");
+    p.width = p.height = size * 2;
+    const pctx = p.getContext("2d");
+
+    pctx.fillStyle = "#222";
+    pctx.fillRect(0, 0, p.width, p.height);
+
+    pctx.fillStyle = "#2e2e2e";
+    pctx.fillRect(0, 0, size, size);
+    pctx.fillRect(size, size, size, size);
+
+    return ctx.createPattern(p, "repeat");
+}
+
+const checkerPattern = createCheckerPattern();
+
+thresholdSlider.oninput = () => {
+    thValue.textContent = thresholdSlider.value;
+    if (targetColor) applyTransparency();
+};
+
+fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.fillStyle = checkerPattern;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        targetColor = null;
+    };
+    img.src = URL.createObjectURL(file);
+};
+
+canvas.addEventListener("click", e => {
+    if (!originalImageData) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor(e.clientX - rect.left);
+    const y = Math.floor(e.clientY - rect.top);
+
+    const i = (y * canvas.width + x) * 4;
+    const d = originalImageData.data;
+
+    targetColor = { r: d[i], g: d[i+1], b: d[i+2] };
+    applyTransparency();
+});
+
+resetBtn.onclick = () => {
+    if (!originalImageData) return;
+    targetColor = null;
+    ctx.fillStyle = checkerPattern;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(originalImageData, 0, 0);
+};
+
+saveBtn.onclick = () => {
+    if (!originalImageData) return;
+    const link = document.createElement("a");
+    link.download = "transparent.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+};
+
+function applyTransparency() {
+    const threshold = Number(thresholdSlider.value);
+    const imageData = new ImageData(
+        new Uint8ClampedArray(originalImageData.data),
+        canvas.width,
+        canvas.height
+    );
+
+    const d = imageData.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const dr = d[i]   - targetColor.r;
+        const dg = d[i+1] - targetColor.g;
+        const db = d[i+2] - targetColor.b;
+        const dist = Math.sqrt(dr*dr + dg*dg + db*db);
+
+        if (dist <= threshold) d[i + 3] = 0;
+    }
+
+    // 市松 → 画像 の順で描画
+    ctx.fillStyle = checkerPattern;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(imageData, 0, 0);
+}
+</script>
+
+</body>
+</html>
