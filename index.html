@@ -3,99 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate JS Obfuscator V6 - The "Obfuscator" Edition</title>
-    <!-- LZ-String, Terser, and Babel Standalone (AST解析用) -->
+    <title>Ultimate JS Obfuscator V7 - Silent Chaos Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/terser/dist/bundle.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root { --bg: #09090b; --panel: #18181b; --primary: #06b6d4; --primary-hover: #0891b2; --success: #10b981; --text: #fafafa; --muted: #a1a1aa; --border: #27272a; }
+        :root { --bg: #0a0a0a; --panel: #171717; --primary: #fbbf24; --primary-hover: #f59e0b; --success: #10b981; --text: #f5f5f5; --muted: #a3a3a3; --border: #2dd4bf; }
         body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { font-size: 2.2rem; color: var(--primary); text-align: center; margin-bottom: 5px; text-shadow: 0 0 15px rgba(6, 182, 212, 0.4); letter-spacing: -0.5px; }
+        .container { max-width: 1250px; margin: 0 auto; }
+        h1 { font-size: 2.2rem; color: var(--primary); text-align: center; margin-bottom: 5px; text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); letter-spacing: -0.5px; }
         p.subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 25px; }
         
-        .layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
-        @media (max-width: 850px) { .layout { grid-template-columns: 1fr; } }
+        .layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
         
         .editor-section { display: flex; flex-direction: column; gap: 15px; }
-        .settings-section { background: var(--panel); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+        .settings-section { background: var(--panel); padding: 20px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 8px 30px rgba(0,0,0,0.8); }
         
-        h3 { margin-top: 0; color: #e4e4e7; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px; }
+        h3 { margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 15px; }
         
-        textarea { width: 100%; height: 260px; background: #000; color: #22d3ee; border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 13px; resize: vertical; box-sizing: border-box; transition: border-color 0.3s; line-height: 1.6; word-break: break-all; }
-        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2); }
+        textarea { width: 100%; height: 260px; background: #000; color: var(--border); border: 1px solid #333; border-radius: 8px; padding: 15px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 13px; resize: vertical; box-sizing: border-box; transition: border-color 0.3s; line-height: 1.6; word-break: break-all; }
+        textarea:focus { outline: none; border-color: var(--primary); }
         
-        .setting-item { display: flex; align-items: flex-start; margin-bottom: 16px; font-size: 0.9rem; }
-        .setting-item input[type="checkbox"] { margin-top: 3px; margin-right: 12px; cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary); }
+        .setting-item { display: flex; align-items: flex-start; margin-bottom: 18px; font-size: 0.9rem; }
+        .setting-item input[type="checkbox"] { margin-top: 3px; margin-right: 12px; accent-color: var(--primary); }
         .setting-text { flex: 1; }
-        .setting-title { display: block; color: #e4e4e7; font-weight: 600; margin-bottom: 4px; }
-        .setting-desc { font-size: 0.75rem; color: var(--muted); display: block; line-height: 1.4; }
+        .setting-title { display: block; color: #fff; font-weight: 600; margin-bottom: 4px; }
+        .setting-desc { font-size: 0.75rem; color: var(--muted); display: block; line-height: 1.5; }
         
         button { background: var(--primary); color: #000; border: none; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.3s; width: 100%; letter-spacing: 1px; }
-        button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4); color: #fff; }
-        button:disabled { background: #3f3f46; cursor: not-allowed; transform: none; box-shadow: none; color: #a1a1aa; }
+        button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4); color: #000; }
+        button:disabled { background: #333; cursor: not-allowed; transform: none; box-shadow: none; color: #777; }
         
         .output-wrap { position: relative; margin-top: 10px; }
-        #outputCode { color: #f472b6; height: 220px; background: #09090b; }
-        .copy-btn { position: absolute; top: 12px; right: 12px; background: var(--success); color: white; padding: 6px 16px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; width: auto; font-weight: bold; }
+        #outputCode { color: #f472b6; height: 240px; background: #050505; border-color: #222; }
+        .copy-btn { position: absolute; top: 12px; right: 12px; background: var(--success); color: white; padding: 6px 16px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
         .copy-btn:hover { background: #059669; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Ultimate JS Obfuscator V6</h1>
-        <p class="subtitle">Babel AST Integration / String Array Hexing / Random Multi-Chunks / The Obfuscator Style</p>
+        <h1>Ultimate JS Obfuscator V7</h1>
+        <p class="subtitle">String-less AST / Math Polymorphism / Silent Tamper Resistance / Distributed Decoders</p>
         
         <div class="layout">
             <div class="editor-section">
                 <textarea id="inputCode" placeholder="ここにJavaScriptを入力してください...
 例:
-function superSecretLogic() {
-  console.log('The Ultimate Obfuscation Activated!');
+function secretLogic() {
+  console.log('Silent Chaos Activated!');
 }
-superSecretLogic();"></textarea>
+secretLogic();"></textarea>
                 
-                <button id="runBtn" onclick="runObfuscation()">🔥 究極難読化を実行 (Babel AST) 🔥</button>
+                <button id="runBtn" onclick="runObfuscation()">🔥 静的カオス難読化を実行 (V7 Engine) 🔥</button>
                 
                 <div class="output-wrap">
-                    <textarea id="outputCode" readonly placeholder="16進数と記号の海と化した最強のワンライナーがここに出力されます..."></textarea>
+                    <textarea id="outputCode" readonly placeholder="数式と基数変換だけで構成された、文字列が存在しないカオスなコードが出力されます..."></textarea>
                     <button class="copy-btn" onclick="copyCode()">コピー</button>
                 </div>
             </div>
 
             <div class="settings-section">
-                <h3>V6 AST エンジン設定</h3>
+                <h3>V7 カオスエンジン機能</h3>
                 
                 <label class="setting-item">
                     <input type="checkbox" checked disabled>
                     <div class="setting-text">
-                        <span class="setting-title">String Array & Hex Escape</span>
-                        <span class="setting-desc">AST解析により全文字列を抽出し、16進数配列に変換して呼び出しを置換します。</span>
+                        <span class="setting-title">文字列の完全排除 (No-String)</span>
+                        <span class="setting-desc">\xや配列を使わず、Base36変換 (例: (28476).toString(36)) と動的生成で全ての文字列をASTレベルで消滅させます。</span>
                     </div>
                 </label>
 
                 <label class="setting-item">
                     <input type="checkbox" checked disabled>
                     <div class="setting-text">
-                        <span class="setting-title">Dynamic Multi-Chunking</span>
-                        <span class="setting-desc">ペイロードを毎回5〜12個のランダムな数のチャンクに分散し、別々の暗号アルゴリズムを割り当てます。</span>
+                        <span class="setting-title">数学的ポリモーフィズム</span>
+                        <span class="setting-desc">16進数のXORではなく、(A * B) - C のようなランダムな数式のツリーを毎回生成し、数値を隠蔽します。</span>
                     </div>
                 </label>
 
                 <label class="setting-item">
                     <input type="checkbox" checked disabled>
                     <div class="setting-text">
-                        <span class="setting-title">AST $/_ 変数リネーム</span>
-                        <span class="setting-desc">解析ツールを狂わせるため、変数名を $, _, 大小文字を混在させた4〜7文字のランダム文字に変更します。</span>
+                        <span class="setting-title">分散復号＆環境依存</span>
+                        <span class="setting-desc">復号関数を1本化せず、ブラウザ環境(window等)やステートマシンの遷移回数を鍵に混ぜてチャンク毎に復元します。</span>
                     </div>
                 </label>
 
                 <label class="setting-item">
                     <input type="checkbox" checked disabled>
                     <div class="setting-text">
-                        <span class="setting-title">Number to XOR AST</span>
-                        <span class="setting-desc">コード上のすべての数字を「0xXX ^ 0xYY」のような複雑な16進数演算式に変換し、数字だらけの見た目を払拭します。</span>
+                        <span class="setting-title">静かな改変検知 (Silent Tamper)</span>
+                        <span class="setting-desc">フォーマッタによる改行を検知すると、警告を出さずに復号キーを「1」だけズラし、最終的なコードを沈黙の中で破壊します。</span>
                     </div>
                 </label>
             </div>
@@ -124,26 +123,13 @@ superSecretLogic();"></textarea>
             return Array.from(str).map(c => c.charCodeAt(0) ^ maskKey);
         }
 
-        // バイナリ配列を The難読化 用の \x エスケープ文字列に変換する
-        function bytesToHexEscapeString(bytes) {
-            return bytes.map(b => '\\x' + b.toString(16).padStart(2, '0')).join('');
-        }
-
-        function strToHexEscapeString(str) {
-            return Array.from(str).map(c => '\\x' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
-        }
-
-        // The難読化 の変数名生成器 ($, _, 大文字, 小文字のみで構成される4〜7文字)
         function genObfuscatedName() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
             const symbols = '$_';
             const allChars = chars + symbols;
-            const len = Math.floor(Math.random() * 4) + 4; // 4 to 7
-            // 先頭は必ず文字か記号（数字はJSルールで不可のため入れない）
+            const len = Math.floor(Math.random() * 4) + 4;
             let res = (Math.random() > 0.5 ? chars : symbols)[Math.floor(Math.random() * (Math.random() > 0.5 ? chars.length : symbols.length))];
-            for(let i=1; i<len; i++) {
-                res += allChars[Math.floor(Math.random() * allChars.length)];
-            }
+            for(let i=1; i<len; i++) res += allChars[Math.floor(Math.random() * allChars.length)];
             return res;
         }
 
@@ -154,155 +140,205 @@ superSecretLogic();"></textarea>
             const output = document.getElementById('outputCode');
 
             if (!input.trim()) return alert("コードを入力してください！");
-            if (typeof Babel === 'undefined') return alert("Babel ASTコンパイラがまだロードされていません。数秒待ってから再試行してください。");
+            if (typeof Babel === 'undefined') return alert("Babelのロードを待っています...");
 
-            btn.innerText = "⏳ AST 解析＆コンパイル中...";
+            btn.innerText = "⏳ カオス空間を生成中...";
             btn.disabled = true;
 
             try {
-                // 1. Terser で初期Minify
+                // 1. 初期Minify
                 let tRes = await Terser.minify(input, { compress: true, mangle: true });
                 if (tRes.error) throw tRes.error;
                 let code = tRes.code;
 
-                // 2. LZ-String 圧縮
+                // 2. 圧縮とチャンク化
                 const compressed = LZString.compressToBase64(code);
-
-                // 3. ランダムな数のチャンク（5〜12）に分割
-                const numChunks = Math.floor(Math.random() * 8) + 5; 
+                const numChunks = Math.floor(Math.random() * 5) + 5; 
                 const cSize = Math.ceil(compressed.length / numChunks);
                 const chunks =[];
                 for(let i = 0; i < numChunks; i++) {
                     chunks.push(compressed.substring(i * cSize, (i + 1) * cSize) || " ");
                 }
 
-                // 4. 各チャンクにランダムな暗号化を適用し、CFFステートと復号ロジックを生成
-                const chunkData = [];
+                // 3. ランダム暗号化（チャンクごとに異なる手法とキー）
+                const chunkData =[];
                 const states = [];
                 const decodes =[];
                 
-                // 動的アルゴリズムの定義を別層化
                 const fD_name = genObfuscatedName();
-                const str_fn_XOR = "return function(p, k) { return p.map(x => String.fromCharCode(x ^ k)).join(''); }";
-                const str_fn_SHIFT = "return function(p, o) { return p.map(x => String.fromCharCode(x - o)).join(''); }";
-                const str_fn_RC4 = "return function(k, p) { let s=[], j=0, x, res=''; for(let i=0; i<256; i++) s[i]=i; for(let i=0; i<256; i++) { j=(j+s[i]+k.charCodeAt(i%k.length))%256; x=s[i]; s[i]=s[j]; s[j]=x; } let ii=0, jj=0; for(let y=0; y<p.length; y++) { ii=(ii+1)%256; jj=(jj+s[ii])%256; x=s[ii]; s[ii]=s[jj]; s[jj]=x; res+=String.fromCharCode(p[y]^s[(s[ii]+s[jj])%256]); } return res; }";
+                const str_fn_XOR = "return function(p, k) { let r=''; for(let i=0;i<p.length;i++) r+=__$fc(p[i] ^ k); return r; }";
+                const str_fn_SHIFT = "return function(p, o) { let r=''; for(let i=0;i<p.length;i++) r+=__$fc(p[i] - o); return r; }";
+                const str_fn_RC4 = "return function(k, p) { let s=[], j=0, x, res=''; for(let i=0; i<256; i++) s[i]=i; for(let i=0; i<256; i++) { j=(j+s[i]+k.charCodeAt(i%k.length))%256; x=s[i]; s[i]=s[j]; s[j]=x; } let ii=0, jj=0; for(let y=0; y<p.length; y++) { ii=(ii+1)%256; jj=(jj+s[ii])%256; x=s[ii]; s[ii]=s[jj]; s[jj]=x; res+=__$fc(p[y]^s[(s[ii]+s[jj])%256]); } return res; }";
 
                 for (let i = 0; i < numChunks; i++) {
-                    let type = Math.floor(Math.random() * 3); // 0: XOR, 1: RC4, 2: Shift
+                    let type = Math.floor(Math.random() * 3); 
                     let stateNum = Math.floor(Math.random() * 8000) + 1000;
                     states.push(stateNum);
                     
                     if (type === 0) {
                         let key = Math.floor(Math.random() * 250) + 1;
                         let enc = maskString(chunks[i], key);
-                        chunkData.push({ idx: i, bytesHex: bytesToHexEscapeString(enc), type: 'x', arg: key });
+                        chunkData.push({ idx: i, arr: enc, type: 'x', arg: key });
                     } else if (type === 1) {
                         let key = "k" + Math.random().toString(36).substring(2, 6);
                         let encStr = rc4Encode(key, chunks[i]);
                         let encBytes = Array.from(encStr).map(c => c.charCodeAt(0));
-                        chunkData.push({ idx: i, bytesHex: bytesToHexEscapeString(encBytes), type: 'r', arg: `"${key}"` });
+                        chunkData.push({ idx: i, arr: encBytes, type: 'r', arg: `"${key}"` });
                     } else {
                         let shift = Math.floor(Math.random() * 20) + 1;
                         let enc = chunks[i].split('').map(c => (c.charCodeAt(0) + shift) % 256);
-                        chunkData.push({ idx: i, bytesHex: bytesToHexEscapeString(enc), type: 's', arg: shift });
+                        chunkData.push({ idx: i, arr: enc, type: 's', arg: shift });
                     }
                 }
 
-                // CFF ステートチェーンの組み立て
+                // CFF ステートの構築（静かな改変検知 _t を遷移キーに混ぜる）
                 for (let i = 0; i < numChunks; i++) {
                     let nextState = (i === numChunks - 1) ? 99999 : states[i + 1];
                     let ch = chunkData[i];
                     decodes.push(`[${states[i]}]: function() {
-                            let dStr = "${ch.bytesHex}";
-                            let arr =[];
-                            for(let i=0; i<dStr.length; i++) arr.push(dStr.charCodeAt(i));
-                            cR[${i}] = ${fD_name}['${ch.type}'](${ch.type==='r' ? ch.arg+', arr' : 'arr, '+ch.arg});
-                            s ^= ${states[i] ^ nextState};
+                            cR[${i}] = ${fD_name}['${ch.type}'](${ch.type==='r' ? ch.arg+', ['+ch.arr.join(',')+']' : '['+ch.arr.join(',')+'], '+ch.arg+' + envK'});
+                            s ^= (${states[i]} ^ ${nextState}) + _t; // 改ざん時はキーがズレて迷子になる
                         }
                     `);
                 }
 
                 const initState = states[0];
-                const str_fn_LZ = `return function() { const f=String.fromCharCode,k="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",b={};function g(c){if(!b[c]){b[c]={};for(let i=0;i<k.length;i++){b[c][k.charAt(i)]=i;}}return b[c];}return{decompressFromBase64:function(I){if(I==null)return"";if(I=="")return null;return this._decompress(I.length,32,function(X){return g(k)[I.charAt(X)];});},_decompress:function(L,R,G){let D=[],n,E=4,S=4,N=3,e="",r=[],i,w,B,rb,M,P,c,d={v:G(0),p:R,x:1};for(i=0;i<3;i+=1){D[i]=i;}B=0;M=Math.pow(2,2);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}switch(n=B){case 0:B=0;M=Math.pow(2,8);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}c=f(B);break;case 1:B=0;M=Math.pow(2,16);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}c=f(B);break;case 2:return"";}D[3]=c;w=c;r.push(c);while(true){if(d.x>L){return"";}B=0;M=Math.pow(2,N);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}switch(c=B){case 0:B=0;M=Math.pow(2,8);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}D[S++]=f(B);c=S-1;E--;break;case 1:B=0;M=Math.pow(2,16);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}D[S++]=f(B);c=S-1;E--;break;case 2:return r.join('');}if(E==0){E=Math.pow(2,N);N++;}if(D[c]){e=D[c];}else{if(c===S){e=w+w.charAt(0);}else{return null;}}r.push(e);D[S++]=w+e.charAt(0);E--;w=e;if(E==0){E=Math.pow(2,N);N++;}}}} }`;
+                const str_fn_LZ = `return function() { const f=__$fc,k="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",b={};function g(c){if(!b[c]){b[c]={};for(let i=0;i<k.length;i++){b[c][k.charAt(i)]=i;}}return b[c];}return{decompressFromBase64:function(I){if(I==null)return"";if(I=="")return null;return this._decompress(I.length,32,function(X){return g(k)[I.charAt(X)];});},_decompress:function(L,R,G){let D=[],n,E=4,S=4,N=3,e="",r=[],i,w,B,rb,M,P,c,d={v:G(0),p:R,x:1};for(i=0;i<3;i+=1){D[i]=i;}B=0;M=Math.pow(2,2);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}switch(n=B){case 0:B=0;M=Math.pow(2,8);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}c=f(B);break;case 1:B=0;M=Math.pow(2,16);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}c=f(B);break;case 2:return"";}D[3]=c;w=c;r.push(c);while(true){if(d.x>L){return"";}B=0;M=Math.pow(2,N);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}switch(c=B){case 0:B=0;M=Math.pow(2,8);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}D[S++]=f(B);c=S-1;E--;break;case 1:B=0;M=Math.pow(2,16);P=1;while(P!=M){rb=d.v&d.p;d.p>>=1;if(d.p==0){d.p=R;d.v=G(d.x++);}B|=(rb>0?1:0)*P;P<<=1;}D[S++]=f(B);c=S-1;E--;break;case 2:return r.join('');}if(E==0){E=Math.pow(2,N);N++;}if(D[c]){e=D[c];}else{if(c===S){e=w+w.charAt(0);}else{return null;}}r.push(e);D[S++]=w+e.charAt(0);E--;w=e;if(E==0){E=Math.pow(2,N);N++;}}}} }`;
 
-                // 5. CFFディスパッチャを持つデコーダー全体を構築
+                // 4. デコーダーの全体構成
+                // __$fc を引数として受け取るラップ関数内に構築し、String.fromCharCodeを隠蔽
                 let coreLogic = `
-                    const ${fD_name} = {
-                        'x': ${str_fn_XOR.replace('return ', '')},
-                        's': ${str_fn_SHIFT.replace('return ', '')},
-                        'r': ${str_fn_RC4.replace('return ', '')},
-                        'l': (${str_fn_LZ.replace('return function', 'function')})()
-                    };
-                    let cR =[];
-                    let s = ${initState};
-                    const m = {
-                        ${decodes.join(',\n')},
-                        [99999]: function() {
-                            const dec = ${fD_name}['l'].decompressFromBase64(cR.join(''));
-                            try { []["filter"]["constructor"](dec)(); } catch(e) {}
-                            s = 0;
-                        }
-                    };
-                    while (s !== 0) { m[s] && m[s](); }
+                    (function(__$fc) {
+                        let _t = 0;
+                        try {
+                            // 静かな改変検知：自分自身の関数定義に改行が含まれていたら _t を 1 にする
+                            if (/\\n|\\r/.test(String(arguments.callee))) { _t = 1; }
+                        } catch(e){}
+
+                        // 環境依存キー
+                        let envK = 0;
+                        try { envK = (typeof window === 'object' ? 0 : 1); } catch(e){}
+
+                        const ${fD_name} = {
+                            x: ${str_fn_XOR.replace('return ', '')},
+                            s: ${str_fn_SHIFT.replace('return ', '')},
+                            r: ${str_fn_RC4.replace('return ', '')},
+                            l: (${str_fn_LZ.replace('return function', 'function')})()
+                        };
+                        let cR =[];
+                        let s = ${initState} + _t;
+                        
+                        const m = {
+                            ${decodes.join(',\n')},[99999]: function() {
+                                const dec = ${fD_name}.l.decompressFromBase64(cR.join(''));
+                                try { []["filter"]["constructor"](dec)(); } catch(e) {}
+                                s = 0;
+                            }
+                        };
+                        while (s !== 0 && m[s]) { m[s](); }
+                    })([]["filter"]["constructor"]("return String")().fromCharCode);
                 `;
 
                 // ==========================================
-                // 6. Babel AST トランスフォーメーション
+                // 5. Babel AST トランスフォーメーション (The Core of V7)
                 // ==========================================
-                const stringArray =[];
                 const renameMap = new Map();
                 
                 const babelPlugin = function({ types: t }) {
+                    
+                    // 数値をポリモーフィックな計算式に変換するロジック
+                    function numberToAst(val) {
+                        if (!Number.isInteger(val) || val < 0 || val > 1000000) return t.numericLiteral(val);
+                        const type = Math.floor(Math.random() * 3);
+                        const a = Math.floor(Math.random() * 500) + 1;
+                        const b = Math.floor(Math.random() * 500) + 1;
+                        let expr;
+                        if (type === 0) { // (a * b) + c
+                            const c = val - (a * b);
+                            expr = t.binaryExpression("+", t.binaryExpression("*", t.numericLiteral(a), t.numericLiteral(b)), t.numericLiteral(c));
+                        } else if (type === 1) { // (a + b) ^ c
+                            const c = val ^ (a + b);
+                            expr = t.binaryExpression("^", t.binaryExpression("+", t.numericLiteral(a), t.numericLiteral(b)), t.numericLiteral(c));
+                        } else { // (a ^ b) - c
+                            const c = (a ^ b) - val;
+                            expr = t.binaryExpression("-", t.binaryExpression("^", t.numericLiteral(a), t.numericLiteral(b)), t.numericLiteral(c));
+                        }
+                        expr.left._isObfuscated = true; expr.right._isObfuscated = true;
+                        return expr;
+                    }
+
+                    // 文字列を完全に排除して式に変換するロジック
+                    function stringToAst(str) {
+                        if (str === "") return t.stringLiteral("");
+                        
+                        // 英数字小文字のみなら Base36 変換を利用
+                        if (/^[a-z0-9]+$/.test(str)) {
+                            const num = parseInt(str, 36);
+                            if (num <= Number.MAX_SAFE_INTEGER) {
+                                // (num).toString(36)
+                                let callNode = t.callExpression(
+                                    t.memberExpression(numberToAst(num), t.identifier("toString")),
+                                    [numberToAst(36)]
+                                );
+                                callNode.callee.property._isObfuscated = true; // toStringという文字を再度変換させない
+                                return callNode;
+                            }
+                        }
+
+                        // それ以外は1文字ずつ __$fc(charCode) を呼び出して結合
+                        let expr = null;
+                        for (let i = 0; i < str.length; i++) {
+                            const code = str.charCodeAt(i);
+                            let charNode = t.callExpression(t.identifier("__$fc"), [numberToAst(code)]);
+                            if (!expr) expr = charNode;
+                            else expr = t.binaryExpression("+", expr, charNode);
+                        }
+                        return expr;
+                    }
+
                     return {
                         visitor: {
-                            // 変数・関数のリネーム（$, _, 大小文字）
                             Program(path) {
                                 path.traverse({
                                     Scope(scopePath) {
                                         for (let name in scopePath.scope.bindings) {
+                                            if (name === "__$fc") continue; // 予約語は保持
                                             if (!renameMap.has(name)) renameMap.set(name, genObfuscatedName());
                                             scopePath.scope.rename(name, renameMap.get(name));
                                         }
                                     }
                                 });
                             },
-                            // プロパティアクセスをブラケットに変換 ( obj.prop -> obj['prop'] )
+                            // プロパティアクセスをブラケットに変換
                             MemberExpression(path) {
-                                if (!path.node.computed && t.isIdentifier(path.node.property)) {
+                                if (!path.node.computed && t.isIdentifier(path.node.property) && !path.node.property._isObfuscated) {
                                     path.node.computed = true;
-                                    path.node.property = t.stringLiteral(path.node.property.name);
+                                    path.node.property = stringToAst(path.node.property.name);
                                 }
                             },
-                            // 文字列をString Array参照に置換
+                            // オブジェクトのキーを式に変換
+                            ObjectProperty(path) {
+                                if (!path.node.computed) {
+                                    const keyName = t.isIdentifier(path.node.key) ? path.node.key.name : path.node.key.value;
+                                    path.node.computed = true;
+                                    path.node.key = stringToAst(keyName);
+                                }
+                            },
+                            // 残る全ての文字列を式に変換
                             StringLiteral(path) {
-                                if (path.node.value === 'use strict') return;
-                                if (path.parent.type === 'Property' && path.parent.key === path.node) return; // オブジェクトキーの破壊防止
-                                
-                                const val = path.node.value;
-                                let idx = stringArray.indexOf(val);
-                                if (idx === -1) { idx = stringArray.length; stringArray.push(val); }
-                                
-                                path.replaceWith(t.memberExpression(t.identifier('_STR'), t.numericLiteral(idx), true));
+                                if (path.node.value === 'use strict' || path.node._isObfuscated) return;
+                                path.replaceWith(stringToAst(path.node.value));
                             },
-                            // 数値をXOR演算のASTに置換
+                            // 数値を多段演算式に変換
                             NumericLiteral(path) {
-                                if (path.parent.type === 'UnaryExpression') return;
-                                const val = path.node.value;
-                                if (Number.isInteger(val) && val >= 0 && val < 0x7FFFFFFF && !path.node._isObfuscated) {
-                                    const mask = Math.floor(Math.random() * 0xFFFF);
-                                    const hidden = val ^ mask;
-                                    const expr = t.binaryExpression('^', t.numericLiteral(hidden), t.numericLiteral(mask));
-                                    expr.left._isObfuscated = true;
-                                    expr.right._isObfuscated = true;
-                                    path.replaceWith(expr);
-                                }
+                                if (path.parent.type === 'UnaryExpression' || path.node._isObfuscated) return;
+                                path.replaceWith(numberToAst(path.node.value));
                             }
                         }
                     };
                 };
 
-                // Babelコンパイル実行
-                const babelResult = Babel.transform(`(()=>{${coreLogic}})();`, {
+                const babelResult = Babel.transform(coreLogic, {
                     plugins: [babelPlugin],
                     minified: true,
                     comments: false,
@@ -310,26 +346,21 @@ superSecretLogic();"></textarea>
                 });
 
                 // ==========================================
-                // 7. Post-Processing (The難読化 Hex String 化)
+                // 6. 最終 Minify
                 // ==========================================
-                
-                // 抽出した文字列配列をすべて \x エスケープの16進数文字列にして先頭に定義
-                const strArrHexed = stringArray.map(s => `"${strToHexEscapeString(s)}"`).join(',');
-                let finalCode = `const _STR=[${strArrHexed}];\n${babelResult.code}`;
-
-                // ASTで生成された数値 (0, 1, 9999など) をすべて 0x 形式の16進数に置換
-                finalCode = finalCode.replace(/\b(\d+)\b/g, (match) => {
-                    return '0x' + Number(match).toString(16);
+                let finalRes = await Terser.minify(babelResult.code, {
+                    compress: { passes: 2, drop_console: false },
+                    mangle: false, // Babelで既にリネーム済み
+                    format: { comments: false }
                 });
 
-                // 完成
-                output.value = finalCode;
+                output.value = finalRes.code;
 
             } catch (e) {
                 alert("エラーが発生しました:\n" + e.message);
                 console.error(e);
             } finally {
-                btn.innerText = "🔥 究極難読化を実行 (Babel AST) 🔥";
+                btn.innerText = "🔥 静的カオス難読化を実行 (V7 Engine) 🔥";
                 btn.disabled = false;
             }
         }
@@ -339,7 +370,7 @@ superSecretLogic();"></textarea>
             if (!output.value) return;
             output.select();
             document.execCommand('copy');
-            alert('コピーしました！\n16進数の海とString Arrayで構成されたThe 難読化コードです。');
+            alert('コピーしました！\n数式とBase36変換だけで構成された、全く新しい概念の難読化コードです。改行すると自壊します。');
         }
     </script>
 </body>
